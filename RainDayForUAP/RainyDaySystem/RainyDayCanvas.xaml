@@ -1,0 +1,36 @@
+﻿<UserControl
+    x:Class="RainDayForUAP.RainyDaySystem.RainyDayCanvas"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+     xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400" Unloaded="UserControl_Unloaded">
+
+    <Grid>
+        <Rectangle Name="bg" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+
+        </Rectangle>
+        <canvas:CanvasAnimatedControl  x:Name="canvas" Width="{Binding ElementName=bg,Path=ActualWidth}" Height="{Binding ElementName=bg,Path=ActualHeight}"
+                                      Update="Canvas_Update"
+                                      Draw="Canvas_Draw"
+                                      CreateResources="Canvas_CreateResources">
+            
+        </canvas:CanvasAnimatedControl>
+        <!--<Border HorizontalAlignment="Center">
+            <Border.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#FF42135D" Offset="0"/>
+                    <GradientStop Color="#FF1D71D4" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <TextBlock  Text="1234121212444" HorizontalAlignment="Center" >
+            </TextBlock>
+        </Border>-->
+    
+
+        <!--<Image Name="imgbg" Stretch="Uniform" Source="1.jpg"/>-->
+    </Grid>
+</UserControl>
