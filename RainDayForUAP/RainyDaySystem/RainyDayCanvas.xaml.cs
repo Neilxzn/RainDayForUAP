@@ -49,17 +49,22 @@ namespace RainDayForUAP.RainyDaySystem
 
         private async Task PrepareRainday(CanvasAnimatedControl sender)
         {
-            imgbackground = await CanvasBitmap.LoadAsync(sender, "Images/bg2.jpg", defaultDpi);
+            imgbackground = await CanvasBitmap.LoadAsync(sender, "Images/bg1.jpg", defaultDpi);
             blurEffect = new GaussianBlurEffect()
             {
                 Source = imgbackground,
                 BlurAmount = 4.0f
             };
             rainday = new RainyDay(sender, (float)sender.Width, (float)sender.Height, imgbackground);
+            rainday.GravityAngle =(float) Math.PI / 9 ;
             var pesets = new List<List<float>>() {
-                new List<float> { 3, 3, 0.88f },
-                new List<float> { 5, 5, 0.9f },
-                new List<float> { 6, 2, 1 } };
+                //new List<float> { 3, 3, 0.88f },
+                //new List<float> { 5, 5, 0.9f },
+                //new List<float> { 6, 2, 1 }
+                new List<float> { 1, 0, 1000 },
+                new List<float> { 3, 3, 1 },
+
+            };
             rainday.Rain(pesets, 100);
         }
 

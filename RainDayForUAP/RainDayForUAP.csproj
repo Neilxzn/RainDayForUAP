@@ -117,6 +117,7 @@
     <None Include="RainDayForUAP_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Images\bg1.jpg" />
     <Content Include="Images\bg2.jpg" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />

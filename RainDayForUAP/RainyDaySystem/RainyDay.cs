@@ -18,7 +18,7 @@ namespace RainDayForUAP.RainyDaySystem
     {
 
         #region Fileds
-        private CanvasBitmap imgReflected;
+        private CanvasBitmap img;
         private CanvasAnimatedControl raindayCanvas;
         private List<List<float>> presets;
         private List<Drop> drops;
@@ -64,6 +64,13 @@ namespace RainDayForUAP.RainyDaySystem
             get { return width; }
             set { width = value; }
         }
+
+        public float GravityAngle
+        {
+            get { return gravityAngle; }
+            set { gravityAngle = value; }
+        }
+
         public bool EnableCollisions
         {
             get { return enableCollisions; }
@@ -102,10 +109,10 @@ namespace RainDayForUAP.RainyDaySystem
             get { return reflection; }
         }
         #endregion
-     
+
         #region Constructor 
 
-        public RainyDay(CanvasAnimatedControl _canvas, float _width, float _height, CanvasBitmap _imgReflected)
+        public RainyDay(CanvasAnimatedControl _canvas, float _width, float _height, CanvasBitmap _img)
         {
             raindayCanvas = _canvas;
             random = new Random();
@@ -113,11 +120,11 @@ namespace RainDayForUAP.RainyDaySystem
             width = _width;
             height = _height;
             //prepare imgReflected
-            imgReflected = _imgReflected;
+            img = _img;
             //prepare drops
             drops = new List<Drop>();
             // assume defaults
-            trail = Trail_Drops;
+            trail = Trail_Smudge;
             gravity = Gravity_Linear;
             collision = Collision_Sample;
             reflection = Reflection_Miniature;
@@ -291,6 +298,19 @@ namespace RainDayForUAP.RainyDaySystem
             }
             return true;
         }
+
+        private bool Trail_Smudge(CanvasDrawingSession context, Drop drop)
+        {
+            var y = drop.Y - drop.R - 3;
+            var x = drop.X - drop.R / 2 + (random.NextDouble() * 2);
+            if (y < 0 || x < 0)
+            {
+                return false;
+            }
+            context.DrawImage(img,new Rect( x,y,drop.R,2), new Rect(x, y, drop.R, 2),1);
+
+            return true;
+        }
         #endregion
 
         #region Gravity Function
@@ -379,7 +399,7 @@ namespace RainDayForUAP.RainyDaySystem
                 drop.Yspeed = gravity_force_factor_Y;
                 drop.Xspeed = gravity_force_factor_X;
             }
-
+            drop.X += drop.Xspeed;
             drop.Y += drop.Yspeed;
             drop.Draw(this, context);
             return false;
@@ -440,7 +460,7 @@ namespace RainDayForUAP.RainyDaySystem
             var sh = PositiveMin(reflectionDropMappingHeight * 2, height - sy);
             var dx = Math.Max(drop.X - 1.1 * drop.R, 0);
             var dy = Math.Max(drop.Y - 1.1 * drop.R, 0);
-            context.DrawImage(imgReflected, new Rect(dx, dy, drop.R * 2, drop.R * 2), new Rect(sx, sy, sw, sh));
+            context.DrawImage(img, new Rect(dx, dy, drop.R * 2, drop.R * 2), new Rect(sx, sy, sw, sh));
             return true;
         }
         private float PositiveMin(float val1, float val2)
