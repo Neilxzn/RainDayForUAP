@@ -10,27 +10,26 @@
     d:DesignWidth="400" Unloaded="UserControl_Unloaded">
 
     <Grid>
-        <Rectangle Name="bg" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid>
+            
+        </Grid>
+        <Grid Grid.Row="1">
+            <Rectangle Name="bg" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
 
-        </Rectangle>
-        <canvas:CanvasAnimatedControl  x:Name="canvas" Width="{Binding ElementName=bg,Path=ActualWidth}" Height="{Binding ElementName=bg,Path=ActualHeight}"
+            </Rectangle>
+            <canvas:CanvasAnimatedControl  x:Name="canvas" Width="{Binding ElementName=bg,Path=ActualWidth}" Height="{Binding ElementName=bg,Path=ActualHeight}"
                                       Update="Canvas_Update"
                                       Draw="Canvas_Draw"
                                       CreateResources="Canvas_CreateResources">
-            
-        </canvas:CanvasAnimatedControl>
-        <!--<Border HorizontalAlignment="Center">
-            <Border.Background>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="#FF42135D" Offset="0"/>
-                    <GradientStop Color="#FF1D71D4" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.Background>
-            <TextBlock  Text="1234121212444" HorizontalAlignment="Center" >
-            </TextBlock>
-        </Border>-->
-    
 
+            </canvas:CanvasAnimatedControl>
+        </Grid>
+       
+     
         <!--<Image Name="imgbg" Stretch="Uniform" Source="1.jpg"/>-->
     </Grid>
 </UserControl>

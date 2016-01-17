@@ -46,7 +46,7 @@ namespace RainDayForUAP.RainyDaySystem
 
         private async Task PrepareRainday(CanvasAnimatedControl sender)
         {
-            imgbackground = await CanvasBitmap.LoadAsync(sender, "Images/bg2.jpg", defaultDpi);
+            imgbackground = await CanvasBitmap.LoadAsync(sender, "Images/bg1.jpg", defaultDpi);
            
             blurEffect = new GaussianBlurEffect()
             {
