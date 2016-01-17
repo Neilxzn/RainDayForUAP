@@ -27,49 +27,56 @@ namespace RainDayForUAP.RainyDaySystem
 {
     public sealed partial class RainyDayCanvas : UserControl
     {
-        public static ICanvasBrush opacityZeroBrush;
+
         const float defaultDpi = 96;
         CanvasRenderTarget glassSurface;
         CanvasBitmap imgbackground;
         GaussianBlurEffect blurEffect;
         RainyDay rainday;
 
-
-
         public RainyDayCanvas()
         {
             InitializeComponent();
         }
-        private void Canvas_CreateResources(Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
+        private void Canvas_CreateResources(CanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
         {
-            glassSurface = new CanvasRenderTarget(sender, (float)sender.Width, (float)sender.Height, defaultDpi);           
-            args.TrackAsyncAction(PrepareRainday(sender).AsAsyncAction());
-            opacityZeroBrush = new CanvasSolidColorBrush(sender, Colors.Transparent);        
+           
+            args.TrackAsyncAction(PrepareRainday(sender).AsAsyncAction());    
         }
 
         private async Task PrepareRainday(CanvasAnimatedControl sender)
         {
-            imgbackground = await CanvasBitmap.LoadAsync(sender, "Images/bg1.jpg", defaultDpi);
+            imgbackground = await CanvasBitmap.LoadAsync(sender, "Images/bg2.jpg", defaultDpi);
+           
             blurEffect = new GaussianBlurEffect()
             {
                 Source = imgbackground,
                 BlurAmount = 4.0f
             };
-            rainday = new RainyDay(sender, (float)sender.Width, (float)sender.Height, imgbackground);
-            rainday.GravityAngle =(float) Math.PI / 9 ;
+            float scalefactor = (float)Math.Min(sender.Size.Width / imgbackground.Size.Width, sender.Size.Height / imgbackground.Size.Height);
+
+            float imgW = (float)imgbackground.Size.Width * scalefactor;
+            float imgH = (float)imgbackground.Size.Height * scalefactor;
+            float imgX = (float)(sender.Size.Width - imgW) / 2;
+            float imgY = (float)(sender.Size.Height - imgH) / 2;
+            glassSurface = new CanvasRenderTarget(sender, imgW, imgH, defaultDpi);
+            rainday = new RainyDay(sender, imgW, imgH, imgbackground)
+            {
+                ImgSclaeFactor = scalefactor,
+                GravityAngle = (float)Math.PI / 9
+            };
+           // rainday.ImgSclaeFactor = scalefactor;
             var pesets = new List<List<float>>() {
                 //new List<float> { 3, 3, 0.88f },
                 //new List<float> { 5, 5, 0.9f },
                 //new List<float> { 6, 2, 1 }
                 new List<float> { 1, 0, 1000 },
                 new List<float> { 3, 3, 1 },
-
             };
             rainday.Rain(pesets, 100);
         }
 
-
-        private void Canvas_Update(Microsoft.Graphics.Canvas.UI.Xaml.ICanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedUpdateEventArgs args)
+        private void Canvas_Update(ICanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedUpdateEventArgs args)
         {
                 using (var ds = glassSurface.CreateDrawingSession())
                 {
@@ -77,17 +84,28 @@ namespace RainDayForUAP.RainyDaySystem
                 }
         }
 
-       
-        private void Canvas_Draw(Microsoft.Graphics.Canvas.UI.Xaml.ICanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedDrawEventArgs args)
+        private void Canvas_Draw(ICanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedDrawEventArgs args)
         {
-            args.DrawingSession.DrawImage(blurEffect);
-            args.DrawingSession.DrawImage(glassSurface,0,0);
+
+            float scalefactor = rainday.ImgSclaeFactor;
+
+            float imgW = (float)imgbackground.Size.Width * scalefactor;
+            float imgH = (float)imgbackground.Size.Height * scalefactor;
+            float imgX = (float)(sender.Size.Width - imgW) / 2;
+            float imgY = (float)(sender.Size.Height - imgH) / 2;
+            args.DrawingSession.DrawImage(blurEffect,new Rect(imgX,imgY,imgW,imgH),new Rect(0,0,imgbackground.Size.Width,imgbackground.Size.Height));
+            args.DrawingSession.DrawImage(glassSurface,imgX,imgY);
         }
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
             canvas.RemoveFromVisualTree();
             canvas = null;
+        }
+
+        private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+
         }
     }
 }

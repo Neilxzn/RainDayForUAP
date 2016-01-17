@@ -139,7 +139,7 @@ namespace RainDayForUAP.RainyDaySystem
             r = 0.95f * r;
             if (r < 3)
             {
-                clipGeo = CanvasGeometry.CreateCircle(rainyday.RaindayCanvas, new Vector2(x, y), r);
+                clipGeo = CanvasGeometry.CreateCircle(context, new Vector2(x, y), r);
             }
             else if (colliding != null || yspeed > 2)
             {
@@ -151,9 +151,8 @@ namespace RainDayForUAP.RainyDaySystem
                     colliding = null;
                 }
                 float yr = 1 + 0.1f * yspeed;
-                using (CanvasPathBuilder path = new CanvasPathBuilder(rainyday.RaindayCanvas))
+                using (CanvasPathBuilder path = new CanvasPathBuilder(context))
                 {
-
                     path.BeginFigure(x - r / yr, y);
                     path.AddCubicBezier(new Vector2(x - r, y - r * 2), new Vector2(x + r, y - r * 2), new Vector2(x + r / yr, y));
                     path.AddCubicBezier(new Vector2(x + r, y + yr * r), new Vector2(x - r, y + yr * r), new Vector2(x - r / yr, y));
@@ -163,8 +162,7 @@ namespace RainDayForUAP.RainyDaySystem
             }
             else
             {
-                clipGeo = CanvasGeometry.CreateCircle(rainyday.RaindayCanvas, new Vector2(x, y), 0.9f * r);
-
+                clipGeo = CanvasGeometry.CreateCircle(context, new Vector2(x, y), 0.9f * r);
             }
             r = orgR;
             if (rainyday.Reflection != null)
@@ -173,14 +171,11 @@ namespace RainDayForUAP.RainyDaySystem
                 {
                     rainyday.Reflection(context, this);
                 }
-
             }
             if (clipGeo != null)
             {
                 clipGeo.Dispose();
             }
-
-
         }
 
         /// <summary>
@@ -191,7 +186,7 @@ namespace RainDayForUAP.RainyDaySystem
         public bool Clear(RainyDay rainyday, CanvasDrawingSession context, bool force=false)
         {
             context.Blend = CanvasBlend.Copy;
-            context.FillRectangle(x - r - 1, y - r - 2, 2 * r + 2, 2 * r + 2, RainyDayCanvas.opacityZeroBrush);
+            context.FillRectangle(x - r - 1, y - r - 2, 2 * r + 2, 2 * r + 2, Colors.Transparent);
             context.Blend = CanvasBlend.SourceOver;
             if (force)
             {

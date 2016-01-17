@@ -18,8 +18,7 @@ namespace RainDayForUAP.RainyDaySystem
     {
 
         #region Fileds
-        private CanvasBitmap img;
-        private CanvasAnimatedControl raindayCanvas;
+        private ICanvasImage img;
         private List<List<float>> presets;
         private List<Drop> drops;
         private CollisionMatrix matrix;
@@ -35,6 +34,7 @@ namespace RainDayForUAP.RainyDaySystem
         private float reflectionDropMappingHeight = 200;
         private float width;
         private float height;
+        private float ImgScalefactor = 1;
         private Random random;
         private bool addDrop;
         private int speed;
@@ -43,15 +43,18 @@ namespace RainDayForUAP.RainyDaySystem
         private Func<CanvasDrawingSession, Drop, bool> gravity;
         private Func<CanvasDrawingSession, Drop, DropItem, bool> collision;
         private Func<CanvasDrawingSession, Drop, bool> reflection;
-
-
         #endregion
 
         #region properties
-        public CanvasAnimatedControl RaindayCanvas
+
+
+
+        public float ImgSclaeFactor
         {
-            get { return raindayCanvas; }
+            get { return ImgScalefactor; }
+            set { ImgScalefactor = value; }
         }
+
         public float Height
         {
             get { return height; }
@@ -112,9 +115,8 @@ namespace RainDayForUAP.RainyDaySystem
 
         #region Constructor 
 
-        public RainyDay(CanvasAnimatedControl _canvas, float _width, float _height, CanvasBitmap _img)
+        public RainyDay(CanvasAnimatedControl _canvas, float _width, float _height, ICanvasImage _img)
         {
-            raindayCanvas = _canvas;
             random = new Random();
             //prepare width and height of region
             width = _width;
@@ -124,7 +126,7 @@ namespace RainDayForUAP.RainyDaySystem
             //prepare drops
             drops = new List<Drop>();
             // assume defaults
-            trail = Trail_Smudge;
+            trail = Trail_Drops;
             gravity = Gravity_Linear;
             collision = Collision_Sample;
             reflection = Reflection_Miniature;
@@ -146,7 +148,7 @@ namespace RainDayForUAP.RainyDaySystem
                 return;
             }
             lastExecutionTime = timestamp;
-            //   if (drops.Count > 130) return;
+            if (drops.Count > 130) return;
             List<float> preset = new List<float>();
             for (var i = 0; i < presets.Count; i++)
             {
@@ -307,7 +309,7 @@ namespace RainDayForUAP.RainyDaySystem
             {
                 return false;
             }
-            context.DrawImage(img,new Rect( x,y,drop.R,2), new Rect(x, y, drop.R, 2),1);
+            context.DrawImage(img, new Rect(x, y, drop.R, 2), new Rect(x / ImgScalefactor, y / ImgScalefactor, drop.R / ImgScalefactor, 2 / ImgScalefactor), 1);
 
             return true;
         }
@@ -454,10 +456,10 @@ namespace RainDayForUAP.RainyDaySystem
         #region Reflection function
         private bool Reflection_Miniature(CanvasDrawingSession context, Drop drop)
         {
-            var sx = Math.Max((drop.X - reflectionDropMappingWidth), 0);
-            var sy = Math.Max((drop.Y - reflectionDropMappingHeight), 0);
-            var sw = PositiveMin(reflectionDropMappingWidth * 2, width - sx);
-            var sh = PositiveMin(reflectionDropMappingHeight * 2, height - sy);
+            var sx = Math.Max((drop.X / ImgScalefactor - reflectionDropMappingWidth), 0);
+            var sy = Math.Max((drop.Y / ImgScalefactor - reflectionDropMappingHeight), 0);
+            var sw = PositiveMin(reflectionDropMappingWidth * 2, width/ImgScalefactor - sx);
+            var sh = PositiveMin(reflectionDropMappingHeight * 2, height / ImgScalefactor - sy);
             var dx = Math.Max(drop.X - 1.1 * drop.R, 0);
             var dy = Math.Max(drop.Y - 1.1 * drop.R, 0);
             context.DrawImage(img, new Rect(dx, dy, drop.R * 2, drop.R * 2), new Rect(sx, sy, sw, sh));

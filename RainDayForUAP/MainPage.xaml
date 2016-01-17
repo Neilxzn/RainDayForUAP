@@ -5,7 +5,7 @@
     xmlns:local="using:RainDayForUAP"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:rainday="using:RainDayForUAP.RainyDaySystem" Width="800" Height="600"
+    xmlns:rainday="using:RainDayForUAP.RainyDaySystem"
     mc:Ignorable="d">
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
@@ -13,7 +13,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
-        <rainday:RainyDayCanvas Grid.Row="1" Width="800" Height="600"/>
+        <rainday:RainyDayCanvas Grid.Row="1" Width="700" Height="500"/>
 
     </Grid>
 </Page>

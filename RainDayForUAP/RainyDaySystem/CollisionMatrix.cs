@@ -33,7 +33,25 @@ namespace RainDayForUAP.RainyDaySystem
             }
         }
         #endregion
-        
+
+        #region Private Methods
+
+        private DropItem AddAll(DropItem to, int x, int y)
+        {
+            if (x > 0 && y > 0 && x < xc && y < yc)
+            {
+                var items = matrix[x][y];
+                while (items.Next != null)
+                {
+                    items = items.Next;
+                    to.Next = new DropItem(items.Dropdata);
+                    to = to.Next;
+                }
+            }
+            return to;
+        }
+        #endregion
+
         #region Public Methods
         public DropItem Update(Drop drop, bool forceDelete)
         {
@@ -90,26 +108,14 @@ namespace RainDayForUAP.RainyDaySystem
             return first;
         }
 
-        public DropItem AddAll(DropItem to, int x, int y)
-        {
-            if (x > 0 && y > 0 && x < xc && y < yc)
-            {
-                var items = matrix[x][y];
-                while (items.Next != null)
-                {
-                    items = items.Next;
-                    to.Next = new DropItem(items.Dropdata);
-                    to = to.Next;
-                }
-            }
-            return to;
-        }
-
         public void Remove(Drop drop)
         {
             matrix[drop.Gmx][drop.Gmy].Remove(drop);
         }
 
         #endregion
+
+     
+
     }
 }
