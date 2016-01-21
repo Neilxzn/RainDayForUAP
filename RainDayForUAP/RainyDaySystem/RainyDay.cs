@@ -93,10 +93,34 @@ namespace RainDayForUAP.RainyDaySystem
             get { return matrix; }
             set { matrix = value; }
         }
-
+        public enum TrailType
+        {
+            Trail_None,
+            Trail_Drops,
+            Trail_Smudge
+        }
+        public TrailType CurrentTrail { get; set; }
         public Func<CanvasDrawingSession, Drop, bool> Trail
         {
-            get { return trail; }
+            get
+            {
+                switch (CurrentTrail)
+                {
+                    case TrailType.Trail_None:
+                         trail = Trail_None;
+                        break;
+                    case TrailType.Trail_Drops:
+                        trail = Trail_Drops;
+                        break;
+                    case TrailType.Trail_Smudge:
+                        trail = Trail_Smudge;
+                        break;
+                    default:
+                        trail = Trail_Drops;
+                        break;
+                }
+                return trail;
+            }
         }
 
         public Func<CanvasDrawingSession, Drop, bool> Gravity
@@ -126,7 +150,7 @@ namespace RainDayForUAP.RainyDaySystem
             //prepare drops
             drops = new List<Drop>();
             // assume defaults
-            trail = Trail_Drops;
+          //  trail = Trail_Drops;
             gravity = Gravity_Linear;
             collision = Collision_Sample;
             reflection = Reflection_Miniature;
@@ -286,7 +310,7 @@ namespace RainDayForUAP.RainyDaySystem
 
 
         #region TRAIL function
-        private bool Trail_None(Drop drop)
+        private bool Trail_None(CanvasDrawingSession context, Drop drop)
         {
             return true;
         }

@@ -6,22 +6,24 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    d:DesignHeight="300" SizeChanged="UserControl_SizeChanged"
+    d:DesignHeight="300" SizeChanged="UserControl_SizeChanged" Loaded="UserControl_Loaded"
     d:DesignWidth="400" Unloaded="UserControl_Unloaded">
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid>
-            
-        </Grid>
-        <Grid Grid.Row="1">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width ="100"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Margin="3">
+            <ComboBox Name="demosCB"  Margin="0,1,0,3" HorizontalAlignment="Stretch" >
+            </ComboBox>
+            <ToggleButton Margin="0,1,0,3" HorizontalAlignment="Stretch" Name="btnPause" Content="Pause" IsChecked="{Binding ElementName=canvas,Path=Paused,Mode=TwoWay}"/>
+        </StackPanel>
+        <Grid Grid.Column="1">
             <Rectangle Name="bg" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
 
             </Rectangle>
-            <canvas:CanvasAnimatedControl  x:Name="canvas" Width="{Binding ElementName=bg,Path=ActualWidth}" Height="{Binding ElementName=bg,Path=ActualHeight}"
+            <canvas:CanvasAnimatedControl  x:Name="canvas"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="{Binding ElementName=bg,Path=ActualWidth}" Height="{Binding ElementName=bg,Path=ActualHeight}"
                                       Update="Canvas_Update"
                                       Draw="Canvas_Draw"
                                       CreateResources="Canvas_CreateResources">

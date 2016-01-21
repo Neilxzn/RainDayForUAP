@@ -33,6 +33,12 @@ namespace RainDayForUAP.RainyDaySystem
         CanvasBitmap imgbackground;
         GaussianBlurEffect blurEffect;
         RainyDay rainday;
+        float scalefactor;
+        float imgW;
+        float imgH;
+        float imgX;
+        float imgY;
+
 
         public RainyDayCanvas()
         {
@@ -40,61 +46,99 @@ namespace RainDayForUAP.RainyDaySystem
         }
         private void Canvas_CreateResources(CanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
         {
-           
-            args.TrackAsyncAction(PrepareRainday(sender).AsAsyncAction());    
+
+            args.TrackAsyncAction(PrepareRainday(sender).AsAsyncAction());
         }
 
-        private async Task PrepareRainday(CanvasAnimatedControl sender)
+        private async Task PrepareRainday(CanvasAnimatedControl sender, string demo = "demo1")
         {
-            imgbackground = await CanvasBitmap.LoadAsync(sender, "Images/bg1.jpg", defaultDpi);
-           
+            string imgPath = "Images/" + demo + ".jpg";
+            imgbackground = await CanvasBitmap.LoadAsync(sender, imgPath, defaultDpi);
+
             blurEffect = new GaussianBlurEffect()
             {
                 Source = imgbackground,
                 BlurAmount = 4.0f
             };
-            float scalefactor = (float)Math.Min(sender.Size.Width / imgbackground.Size.Width, sender.Size.Height / imgbackground.Size.Height);
-
-            float imgW = (float)imgbackground.Size.Width * scalefactor;
-            float imgH = (float)imgbackground.Size.Height * scalefactor;
-            float imgX = (float)(sender.Size.Width - imgW) / 2;
-            float imgY = (float)(sender.Size.Height - imgH) / 2;
+            scalefactor = (float)Math.Min(sender.Size.Width / imgbackground.Size.Width, sender.Size.Height / imgbackground.Size.Height);
+            imgW = (float)imgbackground.Size.Width * scalefactor;
+            imgH = (float)imgbackground.Size.Height * scalefactor;
+            imgX = (float)(sender.Size.Width - imgW) / 2;
+            imgY = (float)(sender.Size.Height - imgH) / 2;
             glassSurface = new CanvasRenderTarget(sender, imgW, imgH, defaultDpi);
-            rainday = new RainyDay(sender, imgW, imgH, imgbackground)
+
+            List<List<float>> pesets;
+           
+
+            if (demo == "demo1")
             {
-                ImgSclaeFactor = scalefactor,
-                GravityAngle = (float)Math.PI / 9
+                rainday = new RainyDay(sender, imgW, imgH, imgbackground)
+                {
+                    ImgSclaeFactor = scalefactor,
+                    GravityAngle = (float)Math.PI / 2
+                };
+                pesets = new List<List<float>>() {
+                new List<float> { 3, 3, 0.88f },
+                new List<float> { 5, 5, 0.9f },
+                new List<float> { 6, 2, 1 }
+                };
+            }
+            else if (demo == "demo2")
+            {
+                rainday = new RainyDay(sender, imgW, imgH, imgbackground)
+                {
+                    ImgSclaeFactor = scalefactor,
+                    GravityAngle = (float)Math.PI / 9
+                };
+                pesets = new List<List<float>>()
+                {
+                    new List<float> { 1, 0, 1000 },
+                    new List<float> { 3, 3, 1 },
+                };
+            }
+            else if (demo == "demo3")
+            {
+                rainday = new RainyDay(sender, imgW, imgH, imgbackground)
+                {
+                    ImgSclaeFactor = scalefactor,
+                    GravityAngle = (float)Math.PI / 2
+                };
+                pesets = new List<List<float>>() {
+                new List<float> { 3, 3, 0.88f },
+                new List<float> { 5, 5, 0.9f },
+                new List<float> { 6, 2, 1 }
             };
-           // rainday.ImgSclaeFactor = scalefactor;
-            var pesets = new List<List<float>>() {
-                //new List<float> { 3, 3, 0.88f },
-                //new List<float> { 5, 5, 0.9f },
-                //new List<float> { 6, 2, 1 }
-                new List<float> { 1, 0, 1000 },
-                new List<float> { 3, 3, 1 },
+                
+            }
+            else
+            {
+                rainday = new RainyDay(sender, imgW, imgH, imgbackground)
+                {
+                    ImgSclaeFactor = scalefactor,
+                    GravityAngle = (float)Math.PI / 2,
+                    CurrentTrail = RainyDay.TrailType.Trail_Smudge
+                };
+                pesets = new List<List<float>>() {
+                new List<float> { 3, 3, 0.88f },
+                new List<float> { 5, 5, 0.9f },
+                new List<float> { 6, 2, 1 }
             };
+            }
             rainday.Rain(pesets, 100);
         }
 
         private void Canvas_Update(ICanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedUpdateEventArgs args)
         {
-                using (var ds = glassSurface.CreateDrawingSession())
-                {
-                    rainday.UpdateDrops(ds);
-                }
+            using (var ds = glassSurface.CreateDrawingSession())
+            {
+                rainday.UpdateDrops(ds);
+            }
         }
 
         private void Canvas_Draw(ICanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedDrawEventArgs args)
         {
-
-            float scalefactor = rainday.ImgSclaeFactor;
-
-            float imgW = (float)imgbackground.Size.Width * scalefactor;
-            float imgH = (float)imgbackground.Size.Height * scalefactor;
-            float imgX = (float)(sender.Size.Width - imgW) / 2;
-            float imgY = (float)(sender.Size.Height - imgH) / 2;
-            args.DrawingSession.DrawImage(blurEffect,new Rect(imgX,imgY,imgW,imgH),new Rect(0,0,imgbackground.Size.Width,imgbackground.Size.Height));
-            args.DrawingSession.DrawImage(glassSurface,imgX,imgY);
+            args.DrawingSession.DrawImage(blurEffect, new Rect(imgX, imgY, imgW, imgH), new Rect(0, 0, imgbackground.Size.Width, imgbackground.Size.Height));
+            args.DrawingSession.DrawImage(glassSurface, imgX, imgY);
         }
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
@@ -103,8 +147,60 @@ namespace RainDayForUAP.RainyDaySystem
             canvas = null;
         }
 
+
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            InitDemoData();
+        }
+
+        void InitDemoData()
+        {
+            List<string> demos = new List<string>()
+            {
+                "demo1","demo2","demo3","demo4"
+            };
+            demosCB.SelectionChanged += DemosCB_SelectionChanged;
+            demosCB.ItemsSource = demos;
+            demosCB.SelectedIndex = 0;
+
+        }
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+
+            string demo;
+            if (demosCB.SelectedValue == null)
+            {
+                demo = "demo1";
+            }
+            else
+            {
+                demo = demosCB.SelectedValue.ToString();
+            }
+            var action = canvas.RunOnGameLoopThreadAsync(async () =>
+            {
+
+                if (glassSurface != null && imgbackground != null)
+                {
+                    await PrepareRainday(canvas, demo);
+                    canvas.Invalidate();
+                }
+
+            });
+        }
+        private void DemosCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox s = sender as ComboBox;
+            string demo = s.SelectedValue.ToString();
+            var action = canvas.RunOnGameLoopThreadAsync(async () =>
+             {
+
+                 if (glassSurface != null && imgbackground != null)
+                 {
+                     await PrepareRainday(canvas, demo);
+                     canvas.Invalidate();
+                 }
+             });
 
         }
     }
