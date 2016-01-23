@@ -40,31 +40,7 @@ namespace RainDayForUAP.RainyDaySystem
         float imgX;
         float imgY;
 
-        private bool fullScreen;
-        public bool FullScreen
-        {
-            get
-            {
-                return fullScreen;
-            }
-            set
-            {
-                if (value)
-                {
-                    ApplicationView.TryUnsnapToFullscreen();
-                 
-                    ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
-                    toolSP.Visibility = Visibility.Collapsed;
-                    fullScreen = true;
-                }
-                else
-                {
-                    ApplicationView.GetForCurrentView().ExitFullScreenMode();
-                    toolSP.Visibility = Visibility.Visible;
-                    fullScreen = false;
-                }
-            }
-        }
+       
 
         public RainyDayCanvas()
         {
@@ -77,17 +53,19 @@ namespace RainDayForUAP.RainyDaySystem
             args.TrackAsyncAction(PrepareRainday(sender).AsAsyncAction());
         }
 
-        private async Task PrepareRainday(CanvasAnimatedControl sender, string demo = "demo1")
+        private async Task PrepareRainday(CanvasAnimatedControl sender, string demo = "demo1",bool isFullScreen=false)
         {
+          
             string imgPath = "Images/" + demo + ".jpg";
             imgbackground = await CanvasBitmap.LoadAsync(sender, imgPath, defaultDpi);
 
             blurEffect = new GaussianBlurEffect()
             {
                 Source = imgbackground,
-                BlurAmount = 4.0f
+                BlurAmount = 4.0f, 
+                BorderMode = EffectBorderMode.Soft
             };
-            scalefactor = (float)Math.Min(sender.Size.Width / imgbackground.Size.Width, sender.Size.Height / imgbackground.Size.Height);
+            scalefactor =isFullScreen? (float)Math.Max(sender.Size.Width / imgbackground.Size.Width, sender.Size.Height / imgbackground.Size.Height) : (float)Math.Min(sender.Size.Width / imgbackground.Size.Width, sender.Size.Height / imgbackground.Size.Height);
             imgW = (float)imgbackground.Size.Width * scalefactor;
             imgH = (float)imgbackground.Size.Height * scalefactor;
             imgX = (float)(sender.Size.Width - imgW) / 2;
@@ -196,8 +174,10 @@ namespace RainDayForUAP.RainyDaySystem
         }
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-
+            canvas.Width = bg.ActualWidth;
+            canvas.Height = bg.ActualHeight;
             string demo;
+            bool isFullScreen = (bool)btnFullScreen.IsChecked;
             if (demosCB.SelectedValue == null)
             {
                 demo = "demo1";
@@ -211,7 +191,7 @@ namespace RainDayForUAP.RainyDaySystem
 
                 if (glassSurface != null && imgbackground != null)
                 {
-                    await PrepareRainday(canvas, demo);
+                    await PrepareRainday(canvas, demo,isFullScreen);
                     canvas.Invalidate();
                 }
 
@@ -221,6 +201,7 @@ namespace RainDayForUAP.RainyDaySystem
         {
             ComboBox s = sender as ComboBox;
             string demo = s.SelectedValue.ToString();
+            double w = canvas.ActualWidth;
             var action = canvas.RunOnGameLoopThreadAsync(async () =>
              {
 
@@ -235,7 +216,23 @@ namespace RainDayForUAP.RainyDaySystem
 
         private void canvas_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            FullScreen = false;
+            btnFullScreen.IsChecked = false;
+        }
+
+        private void btnFullScreen_IsChecked(object sender, RoutedEventArgs e)
+        {
+            if (btnFullScreen.IsChecked==true)
+            {
+                ApplicationView.TryUnsnapToFullscreen();
+
+                ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+                toolSP.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                ApplicationView.GetForCurrentView().ExitFullScreenMode();
+                toolSP.Visibility = Visibility.Visible;
+            }
         }
     }
 }

@@ -11,14 +11,14 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width ="100"/>
+            <ColumnDefinition Width ="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Name="toolSP" Margin="3">
+        <StackPanel Name="toolSP" Margin="3" MinHeight="100">
             <ComboBox Name="demosCB"  Margin="0,1,0,3" HorizontalAlignment="Stretch" >
             </ComboBox>
             <ToggleButton Margin="0,1,0,3" HorizontalAlignment="Stretch" Name="btnPause" Content="Pause" IsChecked="{Binding ElementName=canvas,Path=Paused,Mode=TwoWay}"/>
-            <ToggleButton Margin="0,1,0,3" HorizontalAlignment="Stretch" Name="btnFullScreen" Content="FullScreen" IsChecked="{Binding FullScreen,Mode=TwoWay}"/>
+            <ToggleButton Margin="0,1,0,3" HorizontalAlignment="Stretch" Name="btnFullScreen" Content="FullScreen" Checked="btnFullScreen_IsChecked" Unchecked="btnFullScreen_IsChecked"/>
         </StackPanel>
         <Grid Grid.Column="1">
             <Rectangle Name="bg" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
