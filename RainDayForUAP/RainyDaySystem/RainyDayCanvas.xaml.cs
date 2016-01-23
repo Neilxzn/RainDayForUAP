@@ -20,6 +20,7 @@ using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using System.Threading.Tasks;
 using Microsoft.Graphics.Canvas.Brushes;
+using Windows.UI.ViewManagement;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -39,10 +40,36 @@ namespace RainDayForUAP.RainyDaySystem
         float imgX;
         float imgY;
 
+        private bool fullScreen;
+        public bool FullScreen
+        {
+            get
+            {
+                return fullScreen;
+            }
+            set
+            {
+                if (value)
+                {
+                    ApplicationView.TryUnsnapToFullscreen();
+                 
+                    ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+                    toolSP.Visibility = Visibility.Collapsed;
+                    fullScreen = true;
+                }
+                else
+                {
+                    ApplicationView.GetForCurrentView().ExitFullScreenMode();
+                    toolSP.Visibility = Visibility.Visible;
+                    fullScreen = false;
+                }
+            }
+        }
 
         public RainyDayCanvas()
         {
             InitializeComponent();
+
         }
         private void Canvas_CreateResources(CanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
         {
@@ -68,7 +95,7 @@ namespace RainDayForUAP.RainyDaySystem
             glassSurface = new CanvasRenderTarget(sender, imgW, imgH, defaultDpi);
 
             List<List<float>> pesets;
-           
+
 
             if (demo == "demo1")
             {
@@ -78,6 +105,7 @@ namespace RainDayForUAP.RainyDaySystem
                     GravityAngle = (float)Math.PI / 2
                 };
                 pesets = new List<List<float>>() {
+
                 new List<float> { 3, 3, 0.88f },
                 new List<float> { 5, 5, 0.9f },
                 new List<float> { 6, 2, 1 }
@@ -101,14 +129,15 @@ namespace RainDayForUAP.RainyDaySystem
                 rainday = new RainyDay(sender, imgW, imgH, imgbackground)
                 {
                     ImgSclaeFactor = scalefactor,
+                    CurrentGravity = RainyDay.GravityType.Gravity_None_Linear,
                     GravityAngle = (float)Math.PI / 2
                 };
                 pesets = new List<List<float>>() {
-                new List<float> { 3, 3, 0.88f },
-                new List<float> { 5, 5, 0.9f },
-                new List<float> { 6, 2, 1 }
+                new List<float> {0, 2, 200},
+                new List<float> { 3, 3, 1 }
+
             };
-                
+
             }
             else
             {
@@ -116,12 +145,11 @@ namespace RainDayForUAP.RainyDaySystem
                 {
                     ImgSclaeFactor = scalefactor,
                     GravityAngle = (float)Math.PI / 2,
+                    CurrentGravity = RainyDay.GravityType.Gravity_None_Linear,
                     CurrentTrail = RainyDay.TrailType.Trail_Smudge
                 };
                 pesets = new List<List<float>>() {
-                new List<float> { 3, 3, 0.88f },
-                new List<float> { 5, 5, 0.9f },
-                new List<float> { 6, 2, 1 }
+                new List<float> { 3, 3, 0.1f }
             };
             }
             rainday.Rain(pesets, 100);
@@ -163,6 +191,7 @@ namespace RainDayForUAP.RainyDaySystem
             demosCB.SelectionChanged += DemosCB_SelectionChanged;
             demosCB.ItemsSource = demos;
             demosCB.SelectedIndex = 0;
+            this.DataContext = this;
 
         }
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -202,6 +231,11 @@ namespace RainDayForUAP.RainyDaySystem
                  }
              });
 
+        }
+
+        private void canvas_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            FullScreen = false;
         }
     }
 }

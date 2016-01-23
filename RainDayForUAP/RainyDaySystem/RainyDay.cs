@@ -40,7 +40,7 @@ namespace RainDayForUAP.RainyDaySystem
         private int speed;
         private DateTime lastExecutionTime;
         private Func<CanvasDrawingSession, Drop, bool> trail;
-        private Func<CanvasDrawingSession, Drop, bool> gravity;
+       // private Func<CanvasDrawingSession, Drop, bool> gravity;
         private Func<CanvasDrawingSession, Drop, DropItem, bool> collision;
         private Func<CanvasDrawingSession, Drop, bool> reflection;
         #endregion
@@ -99,7 +99,18 @@ namespace RainDayForUAP.RainyDaySystem
             Trail_Drops,
             Trail_Smudge
         }
+
+        public enum GravityType
+        {
+            Gravity_None,
+            Gravity_None_Linear,
+            Gravity_Linear
+
+        }
+
         public TrailType CurrentTrail { get; set; }
+
+        public GravityType CurrentGravity { get; set; }
         public Func<CanvasDrawingSession, Drop, bool> Trail
         {
             get
@@ -125,8 +136,28 @@ namespace RainDayForUAP.RainyDaySystem
 
         public Func<CanvasDrawingSession, Drop, bool> Gravity
         {
-            get { return gravity; }
+            get
+            {
+                Func<CanvasDrawingSession, Drop, bool> gravity;
+                switch (CurrentGravity)
+                {
+                    case GravityType.Gravity_None:
+                        gravity = Gravity_None;
+                        break;
+                    case GravityType.Gravity_None_Linear:
+                        gravity = Gravity_None_Linear;
+                        break;
+                    case GravityType.Gravity_Linear:
+                        gravity = Gravity_Linear;
+                        break;
+                    default:
+                        gravity = Gravity_Linear;
+                        break;
+                }
+                return gravity;
+            }
         }
+
         public Func<CanvasDrawingSession, Drop, DropItem, bool> Collision
         {
             get { return collision; }
@@ -150,8 +181,9 @@ namespace RainDayForUAP.RainyDaySystem
             //prepare drops
             drops = new List<Drop>();
             // assume defaults
-          //  trail = Trail_Drops;
-            gravity = Gravity_Linear;
+            //  trail = Trail_Drops;
+         
+            CurrentGravity = GravityType.Gravity_Linear;
             collision = Collision_Sample;
             reflection = Reflection_Miniature;
         }
@@ -209,7 +241,7 @@ namespace RainDayForUAP.RainyDaySystem
         private void PutDrop(CanvasDrawingSession context, Drop drop)
         {
             drop.Draw(this, context);
-            if (gravity != null && drop.R > gravityThreshold)
+            if (Gravity != null && drop.R > gravityThreshold)
             {
                 if (enableCollisions)
                 {
@@ -340,7 +372,7 @@ namespace RainDayForUAP.RainyDaySystem
         #endregion
 
         #region Gravity Function
-        private bool Gravity_None(Drop drop)
+        private bool Gravity_None(CanvasDrawingSession context, Drop drop)
         {
             return true;
         }
